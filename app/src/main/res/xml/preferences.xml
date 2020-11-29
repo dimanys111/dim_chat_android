@@ -1,0 +1,15 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory>
+
+        <EditTextPreference
+            android:key="key_user_name_pref"
+            android:title="Ваше имя:"
+            app:useSimpleSummaryProvider="true"
+            android:dialogTitle="Введите новое имя:"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
