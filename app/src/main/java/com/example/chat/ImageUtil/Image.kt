@@ -1,12 +1,14 @@
 package com.example.chat.ImageUtil
 
 import android.graphics.Bitmap
-import java.io.*
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 
 
-class Image(var image_src: String, var sha1: String, var url: String, var orientation: Int) :
+class Image(var image_src: String, var sha1: String, var url: String, var orientation: Int, var bitmap: Bitmap? = null) :
     Serializable  {
-    var bitmap: Bitmap? = null
 
     @Throws(IOException::class)
     private fun writeObject(stream: ObjectOutputStream) {

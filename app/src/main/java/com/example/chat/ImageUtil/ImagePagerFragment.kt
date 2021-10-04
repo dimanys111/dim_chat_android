@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
@@ -19,6 +18,9 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.chat.MainActivity
 import com.example.chat.R
 import com.example.chat.UserUtil.MyUser
+import com.example.chat.UserUtil.MyUser.Companion.add_images_map
+import com.example.chat.UserUtil.MyUser.Companion.images_list
+import com.example.chat.UserUtil.MyUser.Companion.remove_images_map
 import com.example.chat.Util
 import com.example.chat.Util.Companion.RESULT_LOAD_IMG
 import com.example.chat.Util.Companion.add_image_from_file
@@ -29,14 +31,11 @@ import kotlinx.android.synthetic.main.nav_header_main.*
 import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
-import kotlin.collections.set
 
 
 class ImagesAdapter(
     val imagePagerFragment: ImagePagerFragment
 ) : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
-
-    var images: MutableList<Image> = mutableListOf()
 
     private val mOnClickListener: View.OnClickListener
 
@@ -55,7 +54,7 @@ class ImagesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val image: Image = images[position]
+        val image: Image = images_list[position]
         Util.set_image_bitmap(holder.mImage, image)
         Util.scale_height_Image(
             holder.mImage,
@@ -69,8 +68,7 @@ class ImagesAdapter(
     }
 
     override fun getItemCount(): Int {
-        images = MyUser.images_map.values.toMutableList()
-        return images.size
+        return images_list.size
     }
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
@@ -83,11 +81,8 @@ class FragmentPagerAdapter(
 ) : FragmentStatePagerAdapter(fm,
     BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    var images: MutableList<Image> = mutableListOf()
-
     override fun getCount(): Int {
-        images = MyUser.images_map.values.toMutableList()
-        return images.size
+        return images_list.size
     }
 
     override fun destroyItem(
@@ -103,7 +98,7 @@ class FragmentPagerAdapter(
     }
 
     override fun getItem(position: Int): Fragment {
-        return FragmentImageView.newInstance(images[position])
+        return FragmentImageView.newInstance(images_list[position])
     }
 }
 
@@ -111,10 +106,10 @@ class ImagePagerFragment : Fragment(),
     OnPageChangeListener {
     private var position = 0
     var viewPage: ViewPager? = null
-    private var adapter_ViewPager: FragmentPagerAdapter? = null
     private var layoutManager: LinearLayoutManager? = null
 
-    private var adapter_RecyclerView: ImagesAdapter? = null
+    var adapter_ViewPager: FragmentPagerAdapter? = null
+    var adapter_RecyclerView: ImagesAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -136,7 +131,7 @@ class ImagePagerFragment : Fragment(),
             layoutManager = this@ImagePagerFragment.layoutManager
             adapter = this@ImagePagerFragment.adapter_RecyclerView
         }
-        val pos = MyUser.images_map.values.toMutableList().indexOf(
+        val pos = images_list.indexOf(
             MyUser.avatar
         )
         viewPage?.currentItem = pos
@@ -150,10 +145,10 @@ class ImagePagerFragment : Fragment(),
         MainActivity.activity?.textview_title?.text = "Images"
         MainActivity.activity?.circleImageView?.visibility = View.GONE
 
-        val h = Handler()
-        h.postDelayed({
-            adapter_ViewPager?.notifyDataSetChanged()
-        },50)
+//        val h = Handler()
+//        h.postDelayed({
+//            adapter_ViewPager?.notifyDataSetChanged()
+//        },50)
 
     }
 
@@ -170,16 +165,13 @@ class ImagePagerFragment : Fragment(),
                 true
             }
             R.id.dell_image -> {
-                if(MyUser.images_map.isNotEmpty()) {
-                    val sha1 = adapter_ViewPager?.images!![position].sha1
-                    MyUser.images_map.remove(sha1)
-                    adapter_RecyclerView?.notifyDataSetChanged()
-                    adapter_ViewPager?.notifyDataSetChanged()
-
-                    if (MyUser.images_map.isNotEmpty()) {
+                if(images_list.isNotEmpty()) {
+                    val sha1 = images_list[position].sha1
+                    remove_images_map(sha1)
+                    if (images_list.isNotEmpty()) {
                         position = 0
                         viewPage?.currentItem = position
-                        MyUser.avatar = MyUser.images_map.values.toMutableList()[0]
+                        MyUser.avatar = images_list[0]
                         Util.set_image_bitmap(
                             MainActivity.activity?.iv_icon_user,
                             MyUser.avatar
@@ -214,7 +206,7 @@ class ImagePagerFragment : Fragment(),
                     val imageStream = requireActivity().contentResolver.openInputStream(selectedPicture)!!
 
                     val (bmp,sha1_old) = add_image_from_file(imageStream) { sha1_new, sha1_old ->
-                        MyUser.images_map.remove(sha1_old)
+                        remove_images_map(sha1_old)
                         add_images_map_user(sha1_new)
                         val ba = readFiletoByteArray(File(MainActivity.files_src_map_all[sha1_new]!!))
                         MyUser.send_webSocket_arh(ba)
@@ -232,25 +224,23 @@ class ImagePagerFragment : Fragment(),
                                 ).toString()
                         )
                     }
-                    MyUser.images_map[sha1_old] =
-                        Image(
-                            MainActivity.files_src_map_all[sha1_old]!!,
-                            sha1_old,
-                            MainActivity.files_src_map_all[sha1_old]!!,
-                            orientation(sha1_old)
-                        )
-                    MyUser.images_map[sha1_old]?.bitmap=bmp
+                    val im = Image(
+                        MainActivity.files_src_map_all[sha1_old]!!,
+                        sha1_old,
+                        MainActivity.files_src_map_all[sha1_old]!!,
+                        orientation(sha1_old),
+                        bmp
+                    )
+                    add_images_map(sha1_old,im)
 
-                    MyUser.avatar = MyUser.images_map[sha1_old]!!
+                    MyUser.avatar = im
                     MainActivity.runOnUiThread(
                         Runnable {
                             Util.set_image_bitmap(
                                 MainActivity.activity?.iv_icon_user,
                                 MyUser.avatar
                             )
-                            adapter_ViewPager?.notifyDataSetChanged()
-                            adapter_RecyclerView?.notifyDataSetChanged()
-                            viewPage?.currentItem = adapter_ViewPager!!.images.size - 1
+                            viewPage?.currentItem = images_list.size - 1
                         })
                 } catch (e: FileNotFoundException) {
                     MainActivity.runOnUiThread(
@@ -266,22 +256,21 @@ class ImagePagerFragment : Fragment(),
     }
 
     private fun add_images_map_user(sha1_new: String) {
-        MyUser.images_map[sha1_new] = Image(
+        val im = Image(
             MainActivity.files_src_map_all[sha1_new]!!,
             sha1_new,
             MainActivity.files_src_map_all[sha1_new]!!,
             orientation(sha1_new)
         )
+        add_images_map(sha1_new, im)
 
-        MyUser.avatar = MyUser.images_map[sha1_new]!!
+        MyUser.avatar = im
         MainActivity.runOnUiThread(Runnable {
             Util.set_image_bitmap(
                 MainActivity.activity?.iv_icon_user,
                 MyUser.avatar
             )
-            adapter_ViewPager?.notifyDataSetChanged()
-            adapter_RecyclerView?.notifyDataSetChanged()
-            viewPage?.currentItem = adapter_ViewPager!!.images.size - 1
+            viewPage?.currentItem = images_list.size - 1
         })
     }
 
@@ -295,7 +284,7 @@ class ImagePagerFragment : Fragment(),
 
     override fun onPageSelected(position: Int) {
         this.position = position
-        MyUser.avatar = MyUser.images_map.values.toMutableList()[position]
+        MyUser.avatar = images_list[position]
         MainActivity.activity?.let {
             Util.set_image_bitmap(
                 it.iv_icon_user,

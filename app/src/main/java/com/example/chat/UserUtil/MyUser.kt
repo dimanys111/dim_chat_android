@@ -2,11 +2,13 @@ package com.example.chat.UserUtil
 
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
+import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.example.chat.*
 import com.example.chat.ImageUtil.Image
+import com.example.chat.ImageUtil.ImagePagerFragment.Companion.imagePagerFragment
 import com.example.chat.MainActivity.Companion.list_websok_send_mess
 import com.example.chat.Util.Companion.orientation
 import com.example.chat.ui.login.LoginActivity
@@ -37,8 +39,34 @@ class MyUser {
         var password = ""
         var name: String = "User"
 
-        var images_map: MutableMap<String, Image> = mutableMapOf()
+        var images_map_: MutableMap<String, Image> = mutableMapOf()
+        var images_list: MutableList<Image> = images_map_.values.toMutableList()
 
+        fun set_images_map(im: MutableMap<String, Image>) {
+            images_map_=im
+            images_list = images_map_.values.toMutableList()
+            MainActivity.runOnUiThread(Runnable {
+                imagePagerFragment?.adapter_ViewPager?.notifyDataSetChanged()
+                imagePagerFragment?.adapter_RecyclerView?.notifyDataSetChanged()
+            })
+        }
+
+        fun add_images_map(string: String, image: Image) {
+            images_map_[string]=image
+            MainActivity.runOnUiThread(Runnable {
+                images_list = images_map_.values.toMutableList()
+                imagePagerFragment?.adapter_ViewPager?.notifyDataSetChanged()
+                imagePagerFragment?.adapter_RecyclerView?.notifyDataSetChanged()
+            })
+        }
+        fun remove_images_map(string: String) {
+            images_map_.remove(string)
+            MainActivity.runOnUiThread(Runnable {
+                images_list = images_map_.values.toMutableList()
+                imagePagerFragment?.adapter_ViewPager?.notifyDataSetChanged()
+                imagePagerFragment?.adapter_RecyclerView?.notifyDataSetChanged()
+            })
+        }
 
         var avatar = Image("", "", "", 0)
         var users_map: MutableMap<String, User> = mutableMapOf()
@@ -57,6 +85,13 @@ class MyUser {
             }
         }
 
+        fun save()
+        {
+            save_users_to_file()
+            save_images_to_file()
+            save_pref_user_pass()
+        }
+
         fun save_users_to_file() {
             val file = File(dir_current_user, "user_map")
             val outputStream = ObjectOutputStream(FileOutputStream(file))
@@ -69,11 +104,11 @@ class MyUser {
             val file = File(dir_current_user, "images_map")
             if (file.exists()) {
                 val inputStream = ObjectInputStream(FileInputStream(file))
-                images_map = inputStream.readObject() as MutableMap<String, Image>
+                set_images_map(inputStream.readObject() as MutableMap<String, Image>)
                 avatar = inputStream.readObject() as Image
                 inputStream.close()
             } else {
-                images_map = mutableMapOf()
+                set_images_map(mutableMapOf())
                 avatar = Image("", "", "", 0)
             }
         }
@@ -81,7 +116,7 @@ class MyUser {
         fun save_images_to_file() {
             val file = File(dir_current_user, "images_map")
             val outputStream = ObjectOutputStream(FileOutputStream(file))
-            outputStream.writeObject(images_map)
+            outputStream.writeObject(images_map_)
             outputStream.writeObject(avatar)
             outputStream.flush()
             outputStream.close()
@@ -116,22 +151,22 @@ class MyUser {
             name = prefs.getString(
                 KEY_PREF_NAME + MainActivity.current_username, "")!!
 
-            val edit: SharedPreferences.Editor = prefs.edit()
-            edit.putString(
-                SettingsFragment.key_user_name_pref,
-                name
-            )
-            edit.apply()
+//            val edit: SharedPreferences.Editor = prefs.edit()
+//            edit.putString(
+//                SettingsFragment.key_user_name_pref,
+//                name
+//            )
+//            edit.apply()
         }
 
         fun clear() {
-            val del_user= username
-            if(password =="") {
-                clear_curent_user()
+            if(password!="") {
+                save()
             }
-            MainActivity.save_pref_current_user("")
-            set_dir()
-            clear_curent_user()
+            val del_user = username
+            username = ""
+            MainActivity.save_pref_current_user(username)
+            init()
             MainActivity.activity?.start_UsersFragment()
             MainActivity.tv_in?.visibility=View.VISIBLE
             MainActivity.tv_user?.text = name
@@ -139,31 +174,35 @@ class MyUser {
             UsersFragment.usersFragment?.adapter?.users = users_map.values.toMutableList()
             UsersFragment.usersFragment?.adapter?.notifyDataSetChanged()
             send_webSocket_arh(JSONObject()
-                    .put("login", JSONObject()
-                            .put("username", username)
-                            .put("password",password)
-                    ).toString()
-            )
-            send_webSocket_arh(JSONObject()
                 .put("del_user", del_user)
                 .toString()
             )
+            send_webSocket_arh(JSONObject()
+                .put("login", JSONObject()
+                    .put("username", username)
+                    .put("password",password)
+                ).toString()
+            )
         }
 
-        private fun clear_curent_user_() {
+        private fun clear_images_users() {
             avatar = Image("", "", "", 0)
-            images_map = mutableMapOf()
+            set_images_map(mutableMapOf())
             save_images_to_file()
             users_map = mutableMapOf()
             save_users_to_file()
         }
 
-        private fun clear_curent_user() {
+        private fun clear_username_name_password() {
             username = ""
             name = "User"
             password = ""
             save_pref_user_pass()
-            clear_curent_user_()
+        }
+
+        private fun clear_curent_user() {
+            clear_username_name_password()
+            clear_images_users()
         }
 
         fun init() {
@@ -190,7 +229,7 @@ class MyUser {
         fun login(it: JSONObject) {
             val username = it.getString("username")
             val name = it.getString("name")
-            if(username!= Companion.username) {
+            if(username != Companion.username) {
                 MainActivity.runOnUiThread(Runnable {
                     LoginActivity.loading?.visibility = View.GONE
                 })
@@ -201,7 +240,6 @@ class MyUser {
             }
             if (MainActivity.current_username != username) {
                 if(password =="") {
-                    clear_curent_user()
                     MainActivity.runOnUiThread(Runnable {
                             MainActivity.tv_in?.visibility = View.VISIBLE
                         })
@@ -210,8 +248,11 @@ class MyUser {
                             MainActivity.tv_in?.visibility = View.GONE
                         })
                 }
-                MainActivity.save_pref_current_user( username )
-                init()
+                MainActivity.save_pref_current_user(username)
+
+                set_dir()
+                open_users_from_file()
+                open_images_to_file()
 
                 UsersFragment.usersFragment?.adapter?.users = users_map.values.toMutableList()
                 MainActivity.runOnUiThread(Runnable {
@@ -241,25 +282,23 @@ class MyUser {
                             val (ba, sha1) = Util.add_file_from_inputStream(
                                 inputStream
                             )
-                            images_map[sha1] = Image(
+                            add_images_map(sha1, Image(
                                 MainActivity.files_src_map_all[sha1]!!,
                                 sha1,
                                 url_str,
                                 orientation(sha1)
-                            )
+                            ))
                         } catch (ex: IOException) {
                             ex.printStackTrace()
                         }
-
-
                     } else {
-                        if (!images_map.contains(sha1)) {
-                            images_map[sha1] = Image(
+                        if (!images_map_.contains(sha1)) {
+                            add_images_map(sha1, Image(
                                 MainActivity.files_src_map_all[sha1]!!,
                                 sha1,
                                 url_str,
                                 orientation(sha1)
-                            )
+                            ))
                         }
                     }
                 }
@@ -319,34 +358,39 @@ class MyUser {
 
         private fun set_avatar_users(sha1: String) {
             if (!MainActivity.files_src_map_all.contains(sha1)) {
-                val url = URL(avatar.url)
-                val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                val inputStream = connection.inputStream
-                val (ba, sha1) = Util.add_file_from_inputStream(
-                    inputStream
-                )
-                images_map[sha1] = Image(
-                    MainActivity.files_src_map_all[sha1]!!,
-                    sha1,
-                    avatar.url,
-                    orientation(sha1)
-                )
-                avatar = images_map[sha1]!!
-            } else {
-                if(!images_map.contains(sha1)){
-                    images_map[sha1] = Image(
+                try {
+                    val url = URL(avatar.url)
+                    val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+                    connection.doInput = true
+                    connection.connect()
+                    val inputStream = connection.inputStream
+                    val (ba, sha1) = Util.add_file_from_inputStream(
+                        inputStream
+                    )
+                    val im = Image(
                         MainActivity.files_src_map_all[sha1]!!,
                         sha1,
                         avatar.url,
                         orientation(sha1)
                     )
-                } else {
-                    images_map[sha1]?.bitmap=BitmapFactory.decodeFile(
-                        images_map[sha1]?.image_src)
+                    add_images_map(sha1, im)
+                    avatar = im
+                } catch (ex: IOException) {
+                    ex.printStackTrace()
                 }
-                avatar = images_map[sha1]!!
+            } else {
+                if(!images_map_.contains(sha1)){
+                    add_images_map(sha1, Image(
+                        MainActivity.files_src_map_all[sha1]!!,
+                        sha1,
+                        avatar.url,
+                        orientation(sha1)
+                    ))
+                } else {
+                    images_map_[sha1]?.bitmap=BitmapFactory.decodeFile(
+                        images_map_[sha1]?.image_src)
+                }
+                avatar = images_map_[sha1]!!
             }
             MainActivity.runOnUiThread(Runnable {
                 Util.set_image_bitmap(

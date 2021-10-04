@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PowerManager
+import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
@@ -246,9 +247,7 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         super.onStop()
         is_visible=false
         save_list_websok_send_mess_to_file()
-        MyUser.save_users_to_file()
-        MyUser.save_images_to_file()
-        MyUser.save_pref_user_pass()
+        MyUser.save()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -333,14 +332,14 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         fun save_pref_current_user(current_username_:String){
             current_username=current_username_
             val edit: SharedPreferences.Editor = PreferenceManager.getDefaultSharedPreferences(MyApplication.appContext).edit()
-            edit.putString(KEY_PREF_USER, current_username)
+            edit.putString(KEY_PREF_USER_CUR, current_username)
             edit.apply()
         }
 
         fun open_pref_current_user() {
             val prefs: SharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(MyApplication.appContext)
-            current_username = prefs.getString(KEY_PREF_USER, "")!!
+            current_username = prefs.getString(KEY_PREF_USER_CUR, "")!!
         }
 
         fun open_files_to_file() {
@@ -531,7 +530,7 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         private val CHANNEL_ID = "my_channel"
         private val CHANNEL_ID_SOUND = "my_channel_sound"
 
-        private val KEY_PREF_USER = "KEY_PREF_USER"
+        private val KEY_PREF_USER_CUR = "KEY_PREF_USER_CUR"
 
         var tv_user: TextView? = null
         var tv_in: TextView? = null
