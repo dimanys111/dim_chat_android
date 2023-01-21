@@ -40,16 +40,16 @@ android {
                 }
             }
         }
-//        arm64_v8a {
-//            externalNativeBuild {
-//                cmake {
-//                    arguments "-DFLAVOR=ARM64"
-//                }
-//            }
-//        }
+        arm64_v8a {
+            externalNativeBuild {
+                cmake {
+                    arguments "-DFLAVOR=ARM64"
+                }
+            }
+        }
     }
 
-    ndkVersion '22.0.6917172 rc1'
+    ndkVersion '24.0.8215888'
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8

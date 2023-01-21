@@ -45,12 +45,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 if (${FLAVOR} STREQUAL 'ARM64')
-    target_link_libraries(  # Specifies the target library.
-            native-lib
-            # Links the target library to the log library
-            # included in the NDK.
-            ${log-lib}
-            webp_64)
+
 
 endif()
 
@@ -59,9 +54,14 @@ target_link_libraries(  # Specifies the target library.
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib}
-        webp_32)
+        webp_64)
 
 if (${FLAVOR} STREQUAL 'ARM32')
-
+    target_link_libraries(  # Specifies the target library.
+            native-lib
+            # Links the target library to the log library
+            # included in the NDK.
+            ${log-lib}
+            webp_32)
 endif()
 

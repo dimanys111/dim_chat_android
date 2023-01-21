@@ -2,7 +2,6 @@ package com.example.chat.UserUtil
 
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
-import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
 import androidx.preference.PreferenceManager
@@ -26,7 +25,7 @@ class MyUser {
 
     companion object{
 
-        private const val SERVER = "wss://dimanys222.ddns.net/ws"
+        private const val SERVER = "wss://defimov.ddns.net/ws"
         private const val TIMEOUT = 10000
 
         var dir_current_user: File? = null
