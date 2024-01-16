@@ -33,7 +33,7 @@ import com.example.chat.Util.Companion.readFiletoByteArray
 import com.example.chat.Util.Companion.save_ba_to_file
 import com.example.chat.ui.BaseFragment
 import com.example.chat.ui.MyConstraintLayout
-import kotlinx.android.synthetic.main.app_bar_main.*
+
 import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
@@ -71,16 +71,16 @@ class MessagesFragment(val user: User) : BaseFragment() {
         cur_MessagesFragment=this
         super.onStart()
         if(user.activ){
-            MainActivity.activity?.iv_activ_user?.visibility=View.VISIBLE
+            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.VISIBLE
         } else {
-            MainActivity.activity?.iv_activ_user?.visibility=View.GONE
+            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.GONE
         }
         if(!random) {
-            MainActivity.activity?.tv_addition?.text=""
-            MainActivity.activity?.textview_title?.text = user.name
-            MainActivity.activity?.circleImageView?.visibility = View.VISIBLE
+            MainActivity.activity?.activityMainBinding?.appBarMain?.tvAddition?.text=""
+            MainActivity.activity?.activityMainBinding?.appBarMain?.textviewTitle?.text = user.name
+            MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView?.visibility = View.VISIBLE
             Util.set_image_bitmap(
-                MainActivity.activity?.circleImageView,
+                MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView,
                 user.avatar
             )
             MyUser.send_webSocket_(

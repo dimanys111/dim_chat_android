@@ -110,10 +110,6 @@ class CircleImageView : androidx.appcompat.widget.AppCompatImageView {
         background = ColorDrawable(color)
     }
 
-    override fun setBackgroundDrawable(background: Drawable) {
-        setBackground(background)
-    }
-
     override fun onDraw(canvas: Canvas) {
         drawableSettled = syncDrawable()
         if (drawableSettled) {

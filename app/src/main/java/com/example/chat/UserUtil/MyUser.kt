@@ -3,6 +3,7 @@ package com.example.chat.UserUtil
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.example.chat.*
@@ -10,11 +11,12 @@ import com.example.chat.ImageUtil.Image
 import com.example.chat.ImageUtil.ImagePagerFragment.Companion.imagePagerFragment
 import com.example.chat.MainActivity.Companion.list_websok_send_mess
 import com.example.chat.Util.Companion.orientation
+import com.example.chat.ui.CircleImageView
 import com.example.chat.ui.login.LoginActivity
 import com.example.chat.ui.login.RegistrActivity
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketFactory
-import kotlinx.android.synthetic.main.nav_header_main.*
+
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
@@ -169,7 +171,7 @@ class MyUser {
             MainActivity.activity?.start_UsersFragment()
             MainActivity.tv_in?.visibility=View.VISIBLE
             MainActivity.tv_user?.text = name
-            MainActivity.activity?.iv_icon_user?.setImageResource( R.drawable.user )
+            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.setImageResource( R.drawable.user )
             UsersFragment.usersFragment?.adapter?.users = users_map.values.toMutableList()
             UsersFragment.usersFragment?.adapter?.notifyDataSetChanged()
             send_webSocket_arh(JSONObject()
@@ -255,7 +257,7 @@ class MyUser {
 
                 UsersFragment.usersFragment?.adapter?.users = users_map.values.toMutableList()
                 MainActivity.runOnUiThread(Runnable {
-                    MainActivity.activity?.tv_user?.text = name
+                    MainActivity.activity?.activityMainBinding?.navView?.getHeaderView(0)?.findViewById<TextView>(R.id.tv_user)?.text = name
                     UsersFragment.usersFragment?.adapter?.notifyDataSetChanged()
                 })
             }
@@ -314,7 +316,7 @@ class MyUser {
                 } else {
                     MainActivity.runOnUiThread(
                         Runnable {
-                            MainActivity.activity?.iv_icon_user?.setImageBitmap(
+                            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.setImageBitmap(
                                 BitmapFactory.decodeResource(
                                     MainActivity.activity?.resources,
                                     R.drawable.user
@@ -393,7 +395,7 @@ class MyUser {
             }
             MainActivity.runOnUiThread(Runnable {
                 Util.set_image_bitmap(
-                    MainActivity.activity?.iv_icon_user,
+                    MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser,
                     avatar
                 )
             })

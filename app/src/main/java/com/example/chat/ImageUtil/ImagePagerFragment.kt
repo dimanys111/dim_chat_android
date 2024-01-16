@@ -26,8 +26,7 @@ import com.example.chat.Util.Companion.RESULT_LOAD_IMG
 import com.example.chat.Util.Companion.add_image_from_file
 import com.example.chat.Util.Companion.orientation
 import com.example.chat.Util.Companion.readFiletoByteArray
-import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.nav_header_main.*
+import com.example.chat.ui.CircleImageView
 import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
@@ -140,10 +139,10 @@ class ImagePagerFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
-        MainActivity.activity?.iv_activ_user?.visibility=View.GONE
-        MainActivity.activity?.tv_addition?.text=""
-        MainActivity.activity?.textview_title?.text = "Images"
-        MainActivity.activity?.circleImageView?.visibility = View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.tvAddition?.text=""
+        MainActivity.activity?.activityMainBinding?.appBarMain?.textviewTitle?.text = "Images"
+        MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView?.visibility = View.GONE
 
 //        val h = Handler()
 //        h.postDelayed({
@@ -173,12 +172,12 @@ class ImagePagerFragment : Fragment(),
                         viewPage?.currentItem = position
                         MyUser.avatar = images_list[0]
                         Util.set_image_bitmap(
-                            MainActivity.activity?.iv_icon_user,
+                            MainActivity.activity?.activityMainBinding?.navView?.getHeaderView(0)?.findViewById(R.id.iv_icon_user),
                             MyUser.avatar
                         )
                     } else {
-                        MainActivity.activity?.iv_icon_user?.scaleType = ImageView.ScaleType.FIT_CENTER
-                        MainActivity.activity?.iv_icon_user?.setImageBitmap(
+                        MainActivity.activity?.activityMainBinding?.navView?.getHeaderView(0)?.findViewById<CircleImageView>(R.id.iv_icon_user)?.scaleType = ImageView.ScaleType.FIT_CENTER
+                        MainActivity.activity?.activityMainBinding?.navView?.getHeaderView(0)?.findViewById<CircleImageView>(R.id.iv_icon_user)?.setImageBitmap(
                             BitmapFactory.decodeResource(
                                 MainActivity.activity?.resources,
                                 R.drawable.user
@@ -237,7 +236,7 @@ class ImagePagerFragment : Fragment(),
                     MainActivity.runOnUiThread(
                         Runnable {
                             Util.set_image_bitmap(
-                                MainActivity.activity?.iv_icon_user,
+                                MainActivity.activity?.activityMainBinding?.navView?.getHeaderView(0)?.findViewById<CircleImageView>(R.id.iv_icon_user),
                                 MyUser.avatar
                             )
                             viewPage?.currentItem = images_list.size - 1
@@ -267,7 +266,7 @@ class ImagePagerFragment : Fragment(),
         MyUser.avatar = im
         MainActivity.runOnUiThread(Runnable {
             Util.set_image_bitmap(
-                MainActivity.activity?.iv_icon_user,
+                MainActivity.activity?.activityMainBinding?.navView?.getHeaderView(0)?.findViewById<CircleImageView>(R.id.iv_icon_user),
                 MyUser.avatar
             )
             viewPage?.currentItem = images_list.size - 1
@@ -287,7 +286,7 @@ class ImagePagerFragment : Fragment(),
         MyUser.avatar = images_list[position]
         MainActivity.activity?.let {
             Util.set_image_bitmap(
-                it.iv_icon_user,
+                it.activityMainBinding.navView.getHeaderView(0)?.findViewById<CircleImageView>(R.id.iv_icon_user),
                 MyUser.avatar
             )
         }

@@ -12,36 +12,34 @@ import com.example.chat.MessagUtil.MessagesFragment
 import com.example.chat.R
 import com.example.chat.UserDialogFragment
 import com.example.chat.Util
-import kotlinx.android.synthetic.main.item_list.view.*
+import com.example.chat.databinding.ItemListBinding
+
 
 class UsersAdapter(
     var users: MutableList<User>
 ) : RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
 
-    private val mOnClickListener: View.OnClickListener
-    private val mOnLongClickListener: View.OnLongClickListener
+    private lateinit var itemListBinding: ItemListBinding
 
-    init {
-        mOnClickListener = View.OnClickListener { v ->
-            val user = v.tag as User
-            val fragmentManager = activity!!.supportFragmentManager
-            if(user.messag_fragment==null)
-                user.messag_fragment= MessagesFragment.newInstance(user)
-            fragmentManager.beginTransaction().replace(R.id.container_frag, user.messag_fragment!!)
-                .addToBackStack(user.username)
-                .commit()
-        }
-        mOnLongClickListener = View.OnLongClickListener {v ->
-            val user = v.tag as User
-            val dialog = UserDialogFragment(user)
-            dialog.show(activity!!.supportFragmentManager,"123")
-            return@OnLongClickListener true
-        }
+    private val mOnClickListener: View.OnClickListener = View.OnClickListener { v ->
+        val user = v.tag as User
+        val fragmentManager = activity!!.supportFragmentManager
+        if(user.messag_fragment==null)
+            user.messag_fragment= MessagesFragment.newInstance(user)
+        fragmentManager.beginTransaction().replace(R.id.container_frag, user.messag_fragment!!)
+            .addToBackStack(user.username)
+            .commit()
+    }
+    private val mOnLongClickListener: View.OnLongClickListener = View.OnLongClickListener { v ->
+        val user = v.tag as User
+        val dialog = UserDialogFragment(user)
+        dialog.show(activity!!.supportFragmentManager,"123")
+        return@OnLongClickListener true
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_list, parent, false)
+        itemListBinding = ItemListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view = itemListBinding.root
         return ViewHolder(view)
     }
 
@@ -74,11 +72,11 @@ class UsersAdapter(
     override fun getItemCount(): Int = users.size
 
     inner class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
-        val mUserView: ImageView =mView.image
-        val iv_activ_user: ImageView = mView.iv_activ_user
-        val mMessView: TextView = mView.mess
-        val mNameView: TextView = mView.name
-        val ll: LinearLayout = mView.parentLayout
+        val mUserView: ImageView =itemListBinding.image
+        val iv_activ_user: ImageView = itemListBinding.ivActivUser
+        val mMessView: TextView = itemListBinding.mess
+        val mNameView: TextView = itemListBinding.name
+        val ll: LinearLayout = itemListBinding.parentLayout
 
         override fun toString(): String {
             return super.toString() + " '" + mNameView.text + "'"

@@ -12,7 +12,7 @@ import com.example.chat.R
 import com.example.chat.SearchUtil.SearchFragment
 import com.example.chat.Util
 import com.example.chat.Util.Companion.orientation
-import kotlinx.android.synthetic.main.app_bar_main.*
+
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -62,17 +62,17 @@ class UsersFragment : Fragment() {
                 user.activ = activ
                 user.name = name
                 MainActivity.runOnUiThread(Runnable {
-                    MainActivity.activity?.textview_title?.text = name
+                    MainActivity.activity?.activityMainBinding?.appBarMain?.textviewTitle?.text = name
                     var b = false
                     user.messag_fragment?.isVisible?.let {
                         b = it
                     }
                     if (b) {
                         if (activ) {
-                            MainActivity.activity?.iv_activ_user?.visibility =
+                            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility =
                                 View.VISIBLE
                         } else {
-                            MainActivity.activity?.iv_activ_user?.visibility =
+                            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility =
                                 View.GONE
                         }
                     }
@@ -101,7 +101,7 @@ class UsersFragment : Fragment() {
                                 MainActivity.runOnUiThread(
                                     Runnable {
                                         Util.set_image_bitmap(
-                                            MainActivity.activity?.circleImageView,
+                                            MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView,
                                             user.avatar
                                         )
                                     })
@@ -116,7 +116,7 @@ class UsersFragment : Fragment() {
                             MainActivity.runOnUiThread(
                                 Runnable {
                                     Util.set_image_bitmap(
-                                        MainActivity.activity?.circleImageView,
+                                        MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView,
                                         user.avatar
                                     )
                                 })
@@ -138,10 +138,10 @@ class UsersFragment : Fragment() {
                 }
                 if (b) {
                     if (activ) {
-                        MainActivity.activity?.iv_activ_user?.visibility =
+                        MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility =
                             View.VISIBLE
                     } else {
-                        MainActivity.activity?.iv_activ_user?.visibility =
+                        MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility =
                             View.GONE
                     }
                 }
@@ -164,13 +164,13 @@ class UsersFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         if(MyUser.is_login){
-            MainActivity.activity?.iv_activ_user?.visibility=View.VISIBLE
+            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.VISIBLE
         } else {
-            MainActivity.activity?.iv_activ_user?.visibility=View.GONE
+            MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.GONE
         }
-        MainActivity.activity?.tv_addition?.text=""
-        MainActivity.activity?.textview_title?.text = "Чат"
-        MainActivity.activity?.circleImageView?.visibility=View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.tvAddition?.text=""
+        MainActivity.activity?.activityMainBinding?.appBarMain?.textviewTitle?.text = "Чат"
+        MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView?.visibility=View.GONE
     }
 
     override fun onStop() {

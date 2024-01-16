@@ -38,16 +38,17 @@ import com.example.chat.UserUtil.MyUser
 import com.example.chat.UserUtil.User
 import com.example.chat.UserUtil.UsersFragment
 import com.example.chat.Util.Companion.hideKeyboard
+import com.example.chat.databinding.ActivityMainBinding
+import com.example.chat.databinding.AppBarMainBinding
 import com.example.chat.ui.login.LoginActivity
 import com.google.android.material.navigation.NavigationView
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
 import java.io.*
 import java.util.*
 
 class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListener {
     var is_visible = false
 
+    lateinit var activityMainBinding: ActivityMainBinding
     override fun onDestroy() {
         super.onDestroy()
         activity=null
@@ -64,8 +65,8 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
             MessagesFragment.cur_MessagesFragment?.adapter?.notifyDataSetChanged()
             invalidateOptionsMenu()
         } else {
-            if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-                drawer_layout.closeDrawer(GravityCompat.START)
+            if (activityMainBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                activityMainBinding.drawerLayout.closeDrawer(GravityCompat.START)
             } else {
                 var b_tim = false
                 if (current_user != null && current_user == RandomFragment.rand_user && current_user!!.messag_fragment != null && current_user!!.messag_fragment!!.isVisible) {
@@ -123,17 +124,21 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+        val view = activityMainBinding.root
+        setContentView(view)
+
         activity=this
         init()
         alarm_timer()
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
 
-        nav_view.setNavigationItemSelectedListener(this)
+        setSupportActionBar(activityMainBinding.appBarMain.toolbar)
+
+        activityMainBinding.navView.setNavigationItemSelectedListener(this)
 
         val toggle = object: ActionBarDrawerToggle(
-            this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, activityMainBinding.drawerLayout, activityMainBinding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         ){
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 super.onDrawerSlide(drawerView, slideOffset)
@@ -141,13 +146,13 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
             }
         }
 
-        drawer_layout.addDrawerListener(toggle)
+        activityMainBinding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
         start_UsersFragment()
         title = ""
 
-        val headerView = nav_view.getHeaderView(0)
+        val headerView = activityMainBinding.navView.getHeaderView(0)
         val tv_in = headerView.findViewById(R.id.tv_in) as TextView
         MainActivity.tv_in=tv_in
         if(MyUser.password=="") {
@@ -217,7 +222,7 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
             val username = intent.getStringExtra("username")
             val offer = intent.getStringExtra("offer")
             val random = intent.getBooleanExtra("random",false)
-            dialog = CallDialogFragment(username, offer,random)
+            dialog = CallDialogFragment(username ?: "", offer?: "", random)
             dialog?.show(supportFragmentManager,"123")
             intent = Intent()
         }
@@ -377,13 +382,13 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
             )
         }
 
-        private fun getPendAlarm(): PendingIntent? {
+        private fun getPendAlarm(): PendingIntent {
             val intent = Intent(MyApplication.appContext, AlarmTimerReceiver::class.java)
             return PendingIntent.getBroadcast(
                 MyApplication.appContext,
                 192,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_MUTABLE
             )
         }
 

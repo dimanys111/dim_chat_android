@@ -14,7 +14,7 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.chat.MainActivity
 import com.example.chat.R
 import com.example.chat.Util
-import kotlinx.android.synthetic.main.app_bar_main.*
+import com.example.chat.ui.CircleImageView
 
 
 class ImagesMessAdapter(
@@ -124,10 +124,10 @@ class ImagePagerMessFragment(var images: MutableList<Image>, var pos: Int) : Fra
 
     override fun onStart() {
         super.onStart()
-        MainActivity.activity?.iv_activ_user?.visibility=View.GONE
-        MainActivity.activity?.tv_addition?.text=""
-        MainActivity.activity?.textview_title?.text = "Images"
-        MainActivity.activity?.circleImageView?.visibility = View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.tvAddition?.text=""
+        MainActivity.activity?.activityMainBinding?.appBarMain?.textviewTitle?.text = "Images"
+        MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView?.visibility = View.GONE
 
         val h = Handler()
         h.postDelayed({

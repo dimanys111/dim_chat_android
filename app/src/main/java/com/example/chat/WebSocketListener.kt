@@ -14,7 +14,7 @@ import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.neovisionaries.ws.client.WebSocketException
 import com.neovisionaries.ws.client.WebSocketFrame
-import kotlinx.android.synthetic.main.app_bar_main.*
+
 import org.json.JSONObject
 
 class WebSocketListener : WebSocketAdapter() {
@@ -36,7 +36,7 @@ class WebSocketListener : WebSocketAdapter() {
 
         MainActivity.runOnUiThread(Runnable{
             if(usersFragment!=null && usersFragment!!.isVisible){
-                MainActivity.activity?.iv_activ_user?.visibility= View.VISIBLE
+                MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility= View.VISIBLE
             }
         })
     }
@@ -67,7 +67,7 @@ class WebSocketListener : WebSocketAdapter() {
         MyUser.is_login = false
         MainActivity.runOnUiThread(Runnable{
             if(usersFragment!=null && usersFragment!!.isVisible){
-                MainActivity.activity?.iv_activ_user?.visibility= View.GONE
+                MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility= View.GONE
             }
         })
         Handler().postDelayed({
@@ -82,7 +82,7 @@ class WebSocketListener : WebSocketAdapter() {
         MyUser.is_login = false
         MainActivity.runOnUiThread(Runnable{
             if(usersFragment!=null && usersFragment!!.isVisible){
-                MainActivity.activity?.iv_activ_user?.visibility= View.GONE
+                MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility= View.GONE
             }
         })
         Handler().postDelayed({

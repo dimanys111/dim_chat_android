@@ -17,7 +17,7 @@ import com.example.chat.ui.BaseFragment
 import com.example.chat.ui.BlurredLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.app_bar_main.*
+
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
@@ -186,10 +186,10 @@ class RandomFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        MainActivity.activity?.tv_addition?.text="собеседник"
-        MainActivity.activity?.circleImageView?.visibility=View.GONE
-        MainActivity.activity?.textview_title?.text = "Случайный"
-        MainActivity.activity?.iv_activ_user?.visibility=View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.tvAddition?.text="собеседник"
+        MainActivity.activity?.activityMainBinding?.appBarMain?.circleImageView?.visibility=View.GONE
+        MainActivity.activity?.activityMainBinding?.appBarMain?.textviewTitle?.text = "Случайный"
+        MainActivity.activity?.activityMainBinding?.appBarMain?.ivActivUser?.visibility=View.GONE
     }
 
     override fun onStop() {
@@ -218,7 +218,7 @@ class RandomFragment : BaseFragment() {
             rand_user = User(username, name)
             rand_user?.activ=true
             MainActivity.runOnUiThread(Runnable{
-                MainActivity.activity?.tv_addition?.text="Хочет "+want
+                MainActivity.activity?.activityMainBinding?.appBarMain?.tvAddition?.text="Хочет "+want
                 val fragmentManager = MainActivity.activity?.supportFragmentManager
                 rand_user?.messag_fragment = MessagesFragment.newInstance(rand_user!!)
                 rand_user?.messag_fragment!!.random = true

@@ -13,30 +13,32 @@ import com.example.chat.R
 import com.example.chat.UserUtil.MyUser
 import com.example.chat.UserUtil.User
 import com.example.chat.Util
+import com.example.chat.databinding.ActivityMainBinding
+import com.example.chat.databinding.ItemListBinding
 import com.example.chat.ui.CircleImageView
-import kotlinx.android.synthetic.main.item_list.view.*
+
 
 
 class SearchAdapter(
     var searchUsers: MutableList<User>
 ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
-    private val mOnClickListener: View.OnClickListener
-    init {
-        mOnClickListener = View.OnClickListener { v ->
-            val user = v.tag as User
-            val fragmentManager = MainActivity.activity!!.supportFragmentManager
-            MyUser.users_map[user.username]=user
-            if(user.messag_fragment==null)
-                user.messag_fragment= MessagesFragment.newInstance(user)
-            fragmentManager.beginTransaction().replace(R.id.container_frag, user.messag_fragment!!)
-                .addToBackStack(null)
-                .commit()
-        }
+
+    private lateinit var itemListBinding: ItemListBinding
+
+    private val mOnClickListener: View.OnClickListener = View.OnClickListener { v ->
+        val user = v.tag as User
+        val fragmentManager = MainActivity.activity!!.supportFragmentManager
+        MyUser.users_map[user.username]=user
+        if(user.messag_fragment==null)
+            user.messag_fragment= MessagesFragment.newInstance(user)
+        fragmentManager.beginTransaction().replace(R.id.container_frag, user.messag_fragment!!)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_list, parent, false)
+        itemListBinding = ItemListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val view = itemListBinding.root
         return ViewHolder(view)
     }
 
@@ -61,9 +63,9 @@ class SearchAdapter(
     override fun getItemCount(): Int = searchUsers.size
 
     inner class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
-        val mImageView: CircleImageView = mView.image
-        val mNameView: TextView = mView.name
-        val ll: LinearLayout = mView.parentLayout
-        val iv_activ_user: ImageView = mView.iv_activ_user
+        val mImageView: CircleImageView = itemListBinding.image
+        val mNameView: TextView = itemListBinding.name
+        val ll: LinearLayout = itemListBinding.parentLayout
+        val iv_activ_user: ImageView = itemListBinding.ivActivUser
     }
 }
